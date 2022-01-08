@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Users</title>
+</head>
+<body>
+
+<form method="GET" th:action="@{/users/search}" th:object="${search}">
+    <div class="form-group" style="margin-left: 1rem; margin-top: 2rem">
+        <label for="username">Search by name of app or get all:</label>
+        <select class="form-select" id="username" th:field="*{searchBy}">
+            <option th:each="app : ${apps}" th:value="${app[0]}" th:text="${app[1]}">
+            </option>
+        </select>
+    </div>
+    <input class="btn btn-warning" type="submit" value="Search" style="margin-left: 1rem; margin-bottom: 1rem"/>
+</form>
+
+<h2 style="margin: 1rem">Users:</h2>
+
+<div th:if="${error}" class="alert alert-danger" style="margin: 1rem">
+    <h2 th:text="${error}"></h2>
+</div>
+
+<div style="margin: 1rem">
+    <div style="display: flex">
+        <a class="btn btn-primary" th:href="@{/users/create}" role="button" style="margin-bottom: 1rem">Create user</a>
+        <a class="btn btn-secondary" th:href="@{/}" role="button" style="margin-bottom: 1rem; margin-left: 1rem">Home page</a>
+        <form method="POST" th:action="@{/export/users}">
+            <input class="btn btn-dark" type="submit" value="Export" style="margin-left: 1rem; margin-bottom: 1rem"/>
+        </form>
+    </div>
+    <table class="table">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Country</th>
+            <th scope="col">Username</th>
+            <th scope="col">Number of apps</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr th:each="user : ${users}">
+            <th th:text="${user.getId()}" scope="row"></th>
+            <td th:text="${user.getFirstName()}"></td>
+            <td th:text="${user.getLastName()}"></td>
+            <td th:text="${user.getEmail()}"></td>
+            <td th:text="${user.getCountry()}"></td>
+            <td th:text="${user.getUsername()}"></td>
+            <td th:text="${user.getAppList().size()}"></td>
+            <td>
+                <a th:href="@{'/users/' + ${user.getId()}}" class="btn btn-primary">Go to</a>
+            </td>
+            <td>
+                <form th:method="delete" th:action="@{'/users/delete/' + ${user.getId()}}">
+                    <button type="submit" class="btn btn-outline-danger"> Delete</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

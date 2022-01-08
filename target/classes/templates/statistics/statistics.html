@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Statistics</title>
+</head>
+<body style="margin: 1rem; display: flex; justify-content: center; flex-direction: column">
+    <h1 th:text="${title}" style="margin-left: auto; margin-right: auto"></h1>
+    <div style="display: flex">
+        <a class="btn btn-secondary" th:href="@{/}" role="button" style="margin-bottom: 1rem; margin-left: 1rem">Home page</a>
+        <a class="btn btn-primary" th:if="${id < 6}"  th:href="@{'/statistics/' + ${id + 1}}" role="button" style="margin-bottom: 1rem; margin-left: 1rem">Next</a>
+        <a class="btn btn-info" th:if="${id > 1}" th:href="@{'/statistics/' + ${id - 1}}" style="margin-bottom: 1rem; margin-left: 1rem">Previous</a>
+    </div>
+    <div style="width: 100%; height: 500px; display: flex; justify-content: space-evenly; align-items: flex-end; position: relative">
+        <div style="height: 100%; text-align: center; display: flex; flex-direction: column; justify-content: end">
+            <div th:text="${firstHeight} + '%'"></div>
+            <div th:style="'width: 100px; background-color: green; display: flex; align-items: flex-end; justify-content: center;' + 'height:' + ${firstHeight} + '%'">
+                <div th:text="${firstValue}"></div>
+            </div>
+        </div>
+        <div style="height: 100%; text-align: center; display: flex; flex-direction: column; justify-content: end">
+            <div th:text="${secondHeight} + '%'"></div>
+            <div th:style="'width: 100px; background-color: red; display: flex; align-items: flex-end; justify-content: center;' + 'height:' + ${secondHeight} + '%'">
+                <div th:text="${secondValue}"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

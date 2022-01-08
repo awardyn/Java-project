@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>App form</title>
+</head>
+<body style="margin: 1rem">
+<h1 style="margin-bottom: 1rem" th:if="${action == 'create'}">Create app form</h1>
+<h1 style="margin-bottom: 1rem" th:if="${action == 'edit'}">Edit app form</h1>
+
+<div th:if="${error}" class="alert alert-danger" style="margin: 1rem">
+    <h2 th:text="${error}"></h2>
+</div>
+
+<form th:if="${error == null}" method="POST" th:action="@{'/apps/' + ${action == 'edit' ? app.getId() + '/edit' : 'create'}}" th:object="${app}">
+    <input type="number" th:field="*{id}" id="id" hidden/>
+    <div th:if="${#fields.hasErrors()}" style="margin-bottom: 1rem">
+          <span style="color: red">
+             Please correct the problems below and resubmit.
+          </span>
+    </div>
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="Enter name"/>
+        <div class="alert alert-danger"
+          th:if="${#fields.hasErrors('name')}"
+          th:errors="*{name}">Name Error
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="domain">Domain:</label>
+        <input type="text" th:field="*{domain}" id="domain" class="form-control" placeholder="Enter domain"/>
+        <div class="alert alert-danger"
+             th:if="${#fields.hasErrors('domain')}"
+             th:errors="*{domain}">Domain Error
+        </div>
+        <div class="alert alert-danger" th:if="${#fields.hasErrors('global')}">
+            <div th:each="err : ${#fields.errors('global')}" th:text="${err}" class="error"></div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="userList">Users List:</label>
+        <select class="form-select" id="userList" th:field="*{userList}" multiple="multiple" aria-label="multiple select example">
+            <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getUsername()}">
+            </option>
+        </select>
+    </div>
+    <input type="submit" value="Submit"/>
+    <a class="btn btn-secondary" th:href="@{'/apps/' + ${action == 'edit' ? app.getId() : ''}}" role="button">Cancel</a>
+</form>
+</body>
+</html>

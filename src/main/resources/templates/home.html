@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Home</title>
+</head>
+<body>
+    <div style="margin: 1rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
+        <h1>Welcome in Project 2 - Theme 5</h1>
+        <h2>Choose what you want to do</h2>
+        <div>
+            <a class="btn btn-primary" th:href="@{/apps}" role="button" style="max-width: 150px">Apps list</a>
+            <a class="btn btn-secondary" th:href="@{/users}" role="button" style="max-width: 150px">Users list</a>
+            <a class="btn btn-info" th:href="@{/statistics/1}" role="button" style="max-width: 150px">Statistics</a>
+        </div>
+    </div>
+</body>
+</html>
