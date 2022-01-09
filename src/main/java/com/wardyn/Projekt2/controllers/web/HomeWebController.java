@@ -2,11 +2,14 @@ package com.wardyn.Projekt2.controllers.web;
 
 import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
+import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
@@ -17,16 +20,19 @@ import java.util.Random;
 public class HomeWebController {
     private final AppService appService;
     private final UserService userService;
+    private final AuthorizationService authorizationService;
+
     private boolean loaded = false;
 
     @Autowired
-    public HomeWebController(AppService appService, UserService userService) {
+    public HomeWebController(AppService appService, UserService userService, AuthorizationService authorizationService) {
         this.appService = appService;
         this.userService = userService;
+        this.authorizationService = authorizationService;
     }
 
     @GetMapping("/")
-    public String home() {
+    public String home(Model model) {
         if (!loaded) {
             for (App app : appService.getApps()) {
                 Random rand = new Random();
@@ -50,6 +56,15 @@ public class HomeWebController {
             }
             loaded = true;
         }
+        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
+        boolean isUser = authorizationService.role().equals(Role.USER);
+        boolean isGuest = authorizationService.role().equals(Role.GUEST);
+
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isUser", isUser);
+        model.addAttribute("isGuest", isGuest);
+        model.addAttribute("user", authorizationService.getLoggedUser());
+
         return "home";
     }
 }
