@@ -3,7 +3,9 @@ package com.wardyn.Projekt2.controllers.web;
 import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.Search;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
+import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,13 @@ import java.util.stream.Collectors;
 public class AppWebController {
     private final AppService appService;
     private final UserService userService;
+    private final AuthorizationService authorizationService;
 
     @Autowired
-    public AppWebController(AppService appService, UserService userService) {
+    public AppWebController(AppService appService, UserService userService, AuthorizationService authorizationService) {
         this.appService = appService;
         this.userService = userService;
+        this.authorizationService = authorizationService;
     }
 
     @GetMapping("/apps")
@@ -42,6 +46,8 @@ public class AppWebController {
         model.addAttribute("users", list);
         model.addAttribute("search", new Search());
         model.addAttribute("apps", appService.getApps());
+        model.addAttribute("isAdmin", authorizationService.role().equals(Role.ADMIN));
+        model.addAttribute("logged", authorizationService.role().equals(Role.ADMIN) || authorizationService.role().equals(Role.USER));
 
         return "app/apps";
     }
@@ -57,6 +63,8 @@ public class AppWebController {
         model.addAttribute("users", list);
         model.addAttribute("search", new Search(search.getSearchBy()));
         model.addAttribute("apps", appService.getAppsByUserId(search.getSearchBy()));
+        model.addAttribute("isAdmin", authorizationService.role().equals(Role.ADMIN));
+        model.addAttribute("logged", authorizationService.role().equals(Role.ADMIN) || authorizationService.role().equals(Role.USER));
 
         return "app/apps";
     }
@@ -69,6 +77,7 @@ public class AppWebController {
             return "app/app";
         }
 
+        model.addAttribute("isAdmin", authorizationService.role().equals(Role.ADMIN));
         model.addAttribute("app", app);
         model.addAttribute("users", userService.getAppUsers(app.getUserList()));
 
@@ -77,8 +86,13 @@ public class AppWebController {
 
     @GetMapping("/apps/create")
     public String appCreate(Model model) {
+        boolean isAdmin =  authorizationService.role().equals(Role.ADMIN);
+
+        if (!isAdmin) {
+            return "redirect:/apps";
+        }
+
         model.addAttribute("app", new App());
-        model.addAttribute("users", userService.getUsers());
         model.addAttribute("action", "create");
 
         return "app/appForm";
@@ -86,6 +100,12 @@ public class AppWebController {
 
     @GetMapping("/apps/{id}/edit")
     public String appEdit(@PathVariable Integer id, Model model) {
+        boolean isAdmin =  authorizationService.role().equals(Role.ADMIN);
+
+        if (!isAdmin) {
+            return "redirect:/apps";
+        }
+
         App app = appService.getAppById(id);
         if (app == null) {
             model.addAttribute("error", "There is no app with given id");
@@ -93,7 +113,6 @@ public class AppWebController {
         }
 
         model.addAttribute("app", app);
-        model.addAttribute("users", userService.getUsers());
         model.addAttribute("action", "edit");
 
         return "app/appForm";
@@ -102,7 +121,6 @@ public class AppWebController {
     @PostMapping("/apps/create")
     public String createApp(@Valid App app, BindingResult errors, Model model) {
         if (errors.hasErrors()) {
-            model.addAttribute("users", userService.getUsers());
             model.addAttribute("action", "create");
             return "app/appForm";
         }
@@ -112,7 +130,6 @@ public class AppWebController {
         if (domains.contains(app.getDomain())) {
             ObjectError error = new ObjectError("domain", "Domain is not unique");
             errors.addError(error);
-            model.addAttribute("users", userService.getUsers());
             model.addAttribute("action", "create");
             return "app/appForm";
         }
@@ -125,7 +142,6 @@ public class AppWebController {
     @PostMapping("/apps/{id}/edit")
     public String editApp(@Valid App app, BindingResult errors, RedirectAttributes redirectAttributes, Model model) {
         if (errors.hasErrors()) {
-            model.addAttribute("users", userService.getUsers());
             model.addAttribute("action", "edit");
             return "app/appForm";
         }
@@ -135,7 +151,6 @@ public class AppWebController {
         if (domains.contains(app.getDomain())) {
             ObjectError error = new ObjectError("domain", "Domain is not unique");
             errors.addError(error);
-            model.addAttribute("users", userService.getUsers());
             model.addAttribute("action", "edit");
             return "app/appForm";
         }

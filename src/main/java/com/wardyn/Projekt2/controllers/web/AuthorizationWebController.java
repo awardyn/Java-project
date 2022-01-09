@@ -2,27 +2,44 @@ package com.wardyn.Projekt2.controllers.web;
 
 import com.wardyn.Projekt2.domains.Login;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.enums.Role;
+import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.validation.Valid;
+
 @Slf4j
 @Controller
 public class AuthorizationWebController {
 
-    public AuthorizationWebController() {}
+    private final AuthorizationService authorizationService;
+
+    @Autowired
+    public AuthorizationWebController(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
+    }
 
     @GetMapping("/login")
     public String loginView(Model model) {
+        if (!authorizationService.role().equals(Role.GUEST)) {
+            return "redirect:/";
+        }
         model.addAttribute("login", new Login());
         return  "user/loginForm";
     }
 
     @GetMapping("/register")
     public String registerView(Model model) {
+        if (!authorizationService.role().equals(Role.GUEST)) {
+            return "redirect:/";
+        }
+
         model.addAttribute("user", new User());
         model.addAttribute("action", "create");
 
@@ -30,10 +47,12 @@ public class AuthorizationWebController {
     }
 
     @PostMapping("/login")
-    public String login(Model model, BindingResult errors) {
-        if (errors.hasErrors()) {
-            model.addAttribute("error", "error!!!");
+    public String login(Login login, Model model, BindingResult errors) {
+        System.out.println(login.getUsername());
+        boolean loggedIn = authorizationService.login(login);
 
+        if (!loggedIn) {
+            model.addAttribute("error", "Username or password are incorrect, try again");
             return "user/loginForm";
         }
 
@@ -41,9 +60,8 @@ public class AuthorizationWebController {
     }
 
     @PostMapping("/register")
-    public String register(Model model, BindingResult errors) {
+    public String register(@Valid User user, Model model, BindingResult errors) {
         if (errors.hasErrors()) {
-            model.addAttribute("error", "error!!!");
             model.addAttribute("action", "create");
 
             return "user/userForm";

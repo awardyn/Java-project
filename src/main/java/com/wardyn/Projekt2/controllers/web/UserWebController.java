@@ -3,7 +3,9 @@ package com.wardyn.Projekt2.controllers.web;
 import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.Search;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
+import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,13 @@ import java.util.stream.Collectors;
 public class UserWebController {
     private final UserService userService;
     private final AppService appService;
+    private final AuthorizationService authorizationService;
 
     @Autowired
-    public UserWebController(UserService userService, AppService appService) {
+    public UserWebController(UserService userService, AppService appService, AuthorizationService authorizationService) {
         this.userService = userService;
         this.appService = appService;
+        this.authorizationService = authorizationService;
     }
 
     @GetMapping("/users")
@@ -44,7 +48,13 @@ public class UserWebController {
         model.addAttribute("search", new Search());
         model.addAttribute("users", userService.getUsers());
 
-        return "user/users";
+        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
+
+        if (isAdmin) {
+            return "user/users";
+        } else {
+            return "redirect:/";
+        }
     }
 
     @GetMapping("/users/search")
@@ -59,27 +69,44 @@ public class UserWebController {
         model.addAttribute("search", new Search(search.getSearchBy()));
         model.addAttribute("users", userService.getUsersByAppId(search.getSearchBy()));
 
-        return "user/users";
+        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
+
+        if (isAdmin) {
+            return "user/users";
+        } else {
+            return "redirect:/";
+        }
     }
 
     @GetMapping("/users/{id}")
     public String getUserById(@PathVariable Integer id, Model model) {
+        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
+        boolean isUser = authorizationService.role().equals(Role.USER);
         User user = userService.getUserById(id);
         if (user == null) {
             model.addAttribute("error", "There is no user with given id");
             return "user/user";
         }
 
-        model.addAttribute("user", user);
-        model.addAttribute("apps", appService.getUserApps(user.getAppList()));
+        if (isAdmin) {
+            model.addAttribute("user", user);
+            model.addAttribute("apps", appService.getUserApps(user.getAppList()));
 
-        return "user/user";
+            return "user/user";
+        } else {
+            if (isUser && user.getId().equals(id)) {
+                model.addAttribute("user", user);
+                model.addAttribute("apps", appService.getUserApps(user.getAppList()));
+
+                return "user/user";
+            }
+            return "redirect:/";
+        }
     }
 
     @GetMapping("/users/create")
     public String userCreate(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("apps", appService.getApps());
         model.addAttribute("action", "create");
 
         return "user/userForm";
@@ -94,7 +121,6 @@ public class UserWebController {
         }
 
         model.addAttribute("user", user);
-        model.addAttribute("apps", appService.getApps());
         model.addAttribute("action", "edit");
 
         return "user/userForm";
@@ -103,7 +129,6 @@ public class UserWebController {
     @PostMapping("/users/create")
     public String createUser(@Valid User user, BindingResult errors, Model model) {
         if (errors.hasErrors()) {
-            model.addAttribute("apps", appService.getApps());
             model.addAttribute("action", "create");
             return "user/userForm";
         }
@@ -113,11 +138,9 @@ public class UserWebController {
         if (usernames.contains(user.getUsername())) {
             ObjectError error = new ObjectError("domain", "Username is not unique");
             errors.addError(error);
-            model.addAttribute("apps", appService.getApps());
             model.addAttribute("action", "create");
             return "user/userForm";
         }
-
 
         userService.addUser(user);
 
@@ -127,7 +150,6 @@ public class UserWebController {
     @PostMapping("/users/{id}/edit")
     public String editUser(@Valid User user, BindingResult errors, RedirectAttributes redirectAttributes, Model model) {
         if (errors.hasErrors()) {
-            model.addAttribute("apps", appService.getApps());
             model.addAttribute("action", "edit");
             return "user/userForm";
         }
@@ -137,7 +159,6 @@ public class UserWebController {
         if (usernames.contains(user.getUsername())) {
             ObjectError error = new ObjectError("domain", "Username is not unique");
             errors.addError(error);
-            model.addAttribute("apps", appService.getApps());
             model.addAttribute("action", "create");
             return "user/userForm";
         }
