@@ -8,14 +8,14 @@
     <title>User form</title>
 </head>
 <body style="margin: 1rem">
-<h1 style="margin-bottom: 1rem" th:if="${action == 'create'}">Create user form</h1>
+<h1 style="margin-bottom: 1rem" th:if="${action == 'create'}">Register form</h1>
 <h1 style="margin-bottom: 1rem" th:if="${action == 'edit'}">Edit user form</h1>
 
 <div th:if="${error}" class="alert alert-danger" style="margin: 1rem">
     <h2 th:text="${error}"></h2>
 </div>
 
-<form th:if="${error == null}" method="POST" th:action="@{'/users/' + ${action == 'edit' ? user.getId() + '/edit' : 'create'}}" th:object="${user}">
+<form th:if="${error == null}" method="POST" th:action="@{${action == 'edit' ? '/users/' + user.getId() + '/edit' : '/register'}}" th:object="${user}">
     <input type="number" th:field="*{id}" id="id" hidden/>
     <div th:if="${#fields.hasErrors()}" style="margin-bottom: 1rem">
           <span style="color: red">
@@ -78,16 +78,8 @@
             <div th:each="err : ${#fields.errors('global')}" th:text="${err}" class="error"></div>
         </div>
     </div>
-
-    <div class="form-group">
-        <label for="appList">Apps List:</label>
-        <select class="form-select" id="appList" th:field="*{appList}" multiple="multiple" aria-label="multiple select example">
-            <option th:each="app : ${apps}" th:value="${app.getId()}" th:text="${app.getName()}">
-            </option>
-        </select>
-    </div>
     <input type="submit" value="Submit"/>
-    <a class="btn btn-secondary" th:href="@{'/users/' + ${action == 'edit' ? user.getId() : ''}}" role="button">Cancel</a>
+    <a class="btn btn-secondary" th:href="@{/}" role="button">Cancel</a>
 </form>
 </body>
 </html>

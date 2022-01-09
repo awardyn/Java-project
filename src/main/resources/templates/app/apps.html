@@ -30,9 +30,9 @@
 
 <div style="margin: 1rem">
     <div style="display: flex">
-        <a class="btn btn-primary" th:href="@{/apps/create}" role="button" style="margin-bottom: 1rem">Create app</a>
+        <a class="btn btn-primary" th:if="${logged}" th:href="@{/apps/create}" role="button" style="margin-bottom: 1rem">Create app</a>
         <a class="btn btn-secondary" th:href="@{/}" role="button" style="margin-bottom: 1rem; margin-left: 1rem">Home page</a>
-        <form method="POST" th:action="@{/export/apps}">
+        <form th:if="${isAdmin}" method="POST" th:action="@{/export/apps}">
             <input class="btn btn-dark" type="submit" value="Export" style="margin-left: 1rem; margin-bottom: 1rem"/>
         </form>
     </div>
@@ -54,7 +54,7 @@
                 <a th:href="@{'/apps/' + ${app.getId()}}" class="btn btn-primary">Go to</a>
             </td>
             <td>
-                <form th:method="delete" th:action="@{'/apps/delete/' + ${app.getId()}}">
+                <form th:if="${isAdmin}"  th:method="delete" th:action="@{'/apps/delete/' + ${app.getId()}}">
                     <button type="submit" class="btn btn-outline-danger"> Delete</button>
                 </form>
             </td>

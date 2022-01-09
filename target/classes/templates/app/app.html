@@ -28,14 +28,14 @@
             <h2 style="margin-right: 1rem; margin-left: 1rem">Id: </h2>
             <h2 th:text="${app.getId()}"></h2>
         </div>
-        <a class="btn btn-primary" th:href="@{'/apps/' + ${app.getId()} + '/edit'}" role="button" style="margin-bottom: 1rem; max-width: 100px">Edit app</a>
-        <form th:method="delete" th:action="@{'/apps/delete/' + ${app.getId()}}">
+        <a class="btn btn-primary" th:if="${isAdmin}" th:href="@{'/apps/' + ${app.getId()} + '/edit'}" role="button" style="margin-bottom: 1rem; max-width: 100px">Edit app</a>
+        <form th:if="${isAdmin}" th:method="delete" th:action="@{'/apps/delete/' + ${app.getId()}}">
             <button type="submit" class="btn btn-outline-danger" style="margin-bottom: 1rem"> Delete app</button>
         </form>
         <a class="btn btn-secondary" th:href="@{/apps}" role="button" style="margin-bottom: 1rem; max-width: 140px">Go back to list</a>
     </div>
 
-    <div th:if="${users.size() > 0}">
+    <div th:if="${users.size() > 0 && isAdmin}">
         <h3>App users:</h3>
         <table class="table">
             <tr>

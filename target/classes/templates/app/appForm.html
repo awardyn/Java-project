@@ -42,14 +42,6 @@
             <div th:each="err : ${#fields.errors('global')}" th:text="${err}" class="error"></div>
         </div>
     </div>
-
-    <div class="form-group">
-        <label for="userList">Users List:</label>
-        <select class="form-select" id="userList" th:field="*{userList}" multiple="multiple" aria-label="multiple select example">
-            <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getUsername()}">
-            </option>
-        </select>
-    </div>
     <input type="submit" value="Submit"/>
     <a class="btn btn-secondary" th:href="@{'/apps/' + ${action == 'edit' ? app.getId() : ''}}" role="button">Cancel</a>
 </form>
