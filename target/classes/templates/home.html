@@ -21,11 +21,70 @@
             <a class="btn btn-primary" th:href="@{/login}" role="button" style="max-width: 150px">Login</a>
             <a class="btn btn-secondary" th:href="@{/register}" role="button" style="max-width: 150px">Register</a>
         </div>
-        <div style="margin-top: 1rem" th:if="${isUser}">
+        <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center" th:if="${isUser}">
             <a class="btn btn-primary" th:href="@{'/users/' + ${user.getId()} + '/edit'}" role="button" style="max-width: 150px">Edit account</a>
             <form th:method="delete" th:action="@{'/users/delete/' + ${user.getId()}}">
-                <button type="submit" class="btn btn-outline-danger" style="margin-bottom: 1rem"> Delete user</button>
+                <button type="submit" class="btn btn-outline-danger"> Delete user</button>
             </form>
+        </div>
+
+        <div th:if="${user}" style="margin: 1rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
+            <div class="card" style="width: 36rem; margin-bottom: 2rem; padding: 1rem">
+                <div style="display: flex;">
+                    <h1 style="margin-right: 1rem; margin-left: 1rem">First name: </h1>
+                    <h1 th:text="${user.getFirstName()}"> </h1>
+                </div>
+                <div style="display: flex">
+                    <h2 style="margin-right: 1rem; margin-left: 1rem">Last name: </h2>
+                    <h2 th:text="${user.getLastName()}"></h2>
+                </div>
+                <div style="display: flex">
+                    <h3 style="margin-right: 1rem; margin-left: 1rem">Email: </h3>
+                    <h3 th:text="${user.getEmail()}"></h3>
+                </div>
+                <div style="display: flex">
+                    <h3 style="margin-right: 1rem; margin-left: 1rem">Country: </h3>
+                    <h3 th:text="${user.getCountry()}"></h3>
+                </div>
+                <div style="display: flex">
+                    <h3 style="margin-right: 1rem; margin-left: 1rem">Username: </h3>
+                    <h3 th:text="${user.getUsername()}"></h3>
+                </div>
+                <div style="display: flex">
+                    <h3 style="margin-right: 1rem; margin-left: 1rem">Password: </h3>
+                    <h3 th:text="${user.getUserPassword()}"></h3>
+                </div>
+                <div style="display: flex">
+                    <h3 style="margin-right: 1rem; margin-left: 1rem">Id: </h3>
+                    <h3 th:text="${user.getId()}"></h3>
+                </div>
+                <a class="btn btn-primary" th:href="@{'/users/' + ${user.getId()} + '/edit'}" role="button" style="margin-bottom: 1rem; max-width: 100px">Edit user</a>
+                <form th:method="delete" th:action="@{'/users/delete/' + ${user.getId()}}">
+                    <button type="submit" class="btn btn-outline-danger" style="margin-bottom: 1rem"> Delete user</button>
+                </form>
+                <a class="btn btn-secondary" th:href="@{/users}" role="button" style="margin-bottom: 1rem; max-width: 140px">Go back to list</a>
+
+            </div>
+
+            <div th:if="${apps.size() > 0}">
+                <h3>User apps:</h3>
+                <table class="table">
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Domain</th>
+                        <th></th>
+                    </tr>
+                    <tr th:each="app : ${apps}">
+                        <th th:text="${app.getId()}" scope="row"></th>
+                        <td th:text="${app.getName()}"></td>
+                        <td th:text="${app.getDomain()}"></td>
+                        <td>
+                            <a th:href="@{'/apps/' + ${app.getId()}}" class="link-primary">Go to</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </body>

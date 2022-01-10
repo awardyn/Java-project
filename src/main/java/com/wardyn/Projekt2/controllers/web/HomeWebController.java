@@ -59,11 +59,16 @@ public class HomeWebController {
         boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
         boolean isUser = authorizationService.role().equals(Role.USER);
         boolean isGuest = authorizationService.role().equals(Role.GUEST);
+        User loggedUser = authorizationService.getLoggedUser();
 
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isUser", isUser);
         model.addAttribute("isGuest", isGuest);
-        model.addAttribute("user", authorizationService.getLoggedUser());
+        model.addAttribute("user", loggedUser);
+
+        if (loggedUser != null) {
+            model.addAttribute("apps", appService.getUserApps(loggedUser.getAppList()));
+        }
 
         return "home";
     }

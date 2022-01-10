@@ -81,7 +81,7 @@ public class UserWebController {
     @GetMapping("/users/{id}")
     public String getUserById(@PathVariable Integer id, Model model) {
         boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
-        boolean isUser = authorizationService.role().equals(Role.USER);
+
         User user = userService.getUserById(id);
         if (user == null) {
             model.addAttribute("error", "There is no user with given id");
@@ -93,15 +93,8 @@ public class UserWebController {
             model.addAttribute("apps", appService.getUserApps(user.getAppList()));
 
             return "user/user";
-        } else {
-            if (isUser && user.getId().equals(id)) {
-                model.addAttribute("user", user);
-                model.addAttribute("apps", appService.getUserApps(user.getAppList()));
-
-                return "user/user";
-            }
-            return "redirect:/";
         }
+        return "redirect:/";
     }
 
     @GetMapping("/users/create")
