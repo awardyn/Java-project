@@ -5,7 +5,6 @@ import com.wardyn.Projekt2.domains.Search;
 import com.wardyn.Projekt2.domains.User;
 import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
-import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +27,11 @@ import java.util.stream.Collectors;
 public class AppWebController {
     private final AppService appService;
     private final UserService userService;
-    private final AuthorizationService authorizationService;
 
     @Autowired
-    public AppWebController(AppService appService, UserService userService, AuthorizationService authorizationService) {
+    public AppWebController(AppService appService, UserService userService) {
         this.appService = appService;
         this.userService = userService;
-        this.authorizationService = authorizationService;
     }
 
     @GetMapping("/apps")
@@ -94,8 +91,8 @@ public class AppWebController {
 
     @GetMapping("/apps/{id}")
     public String getAppById(@PathVariable Long id, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
-        App app = appService.getAppById(id);
-        if (app == null) {
+        Optional<App> app = appService.getAppById(id);
+        if (!app.isPresent()) {
             model.addAttribute("error", "There is no app with given id");
             return "app/app";
         }
@@ -112,8 +109,8 @@ public class AppWebController {
             model.addAttribute("isAdmin", false);
         }
 
-        model.addAttribute("app", app);
-        model.addAttribute("users", app.getUserList());
+        model.addAttribute("app", app.get());
+        model.addAttribute("users", app.get().getUserList());
 
         return "app/app";
     }
@@ -150,13 +147,13 @@ public class AppWebController {
             return "redirect:/apps";
         }
 
-        App app = appService.getAppById(id);
-        if (app == null) {
+        Optional<App> app = appService.getAppById(id);
+        if (!app.isPresent()) {
             model.addAttribute("error", "There is no app with given id");
             return "app/appForm";
         }
 
-        model.addAttribute("app", app);
+        model.addAttribute("app", app.get());
         model.addAttribute("action", "edit");
 
         return "app/appForm";

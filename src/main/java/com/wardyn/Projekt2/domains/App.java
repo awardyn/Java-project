@@ -11,9 +11,6 @@ import javax.persistence.ManyToMany;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
-import static java.lang.Integer.parseInt;
 
 @Entity
 @Setter
@@ -30,7 +27,6 @@ public class App {
 
     @NotNull(message = "Domain cannot be null")
     @Size(min = 3, max = 50, message = "Domain name must be between 3 and 50 characters")
-    @ValidDomain
     private String domain;
 
     @ManyToMany(fetch = javax.persistence.FetchType.EAGER, mappedBy = "appList")

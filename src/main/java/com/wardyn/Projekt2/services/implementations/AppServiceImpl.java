@@ -6,22 +6,28 @@ import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.repositories.AppRepository;
 import com.wardyn.Projekt2.repositories.UserRepository;
 import com.wardyn.Projekt2.services.interfaces.AppService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Transactional
 public class AppServiceImpl implements AppService {
     final AppRepository appRepository;
     final UserRepository userRepository;
+    private final List<App> apps;
+    private final List<User> users;
 
-    public AppServiceImpl(AppRepository appRepository, UserRepository userRepository) {
+    public AppServiceImpl(AppRepository appRepository, UserRepository userRepository, @Autowired List<App> appList, @Autowired List<User> userList) {
         this.appRepository = appRepository;
         this.userRepository = userRepository;
+        this.apps = appList;
+        this.users = userList;
     }
 
     @Override
@@ -32,8 +38,8 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public App getAppById(Long id) {
-        return this.appRepository.findAppById(id);
+    public Optional<App> getAppById(Long id) {
+        return this.appRepository.findById(id);
     }
 
     @Override
@@ -43,13 +49,13 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public Boolean editApp(App app) {
-        App appToUpdate = getAppById(app.id);
+        Optional<App> appToUpdate = getAppById(app.id);
 
-        if (appToUpdate == null) {
+        if (!appToUpdate.isPresent()) {
             return false;
         }
 
-        app.setId(appToUpdate.getId());
+        app.setId(appToUpdate.get().getId());
 
         this.appRepository.save(app);
 
@@ -59,12 +65,13 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public Boolean deleteApp(Long appId) {
-        App app = this.appRepository.findAppById(appId);
+        Optional<App> app = this.appRepository.findById(appId);
 
-        if (app == null) {
+        if (!app.isPresent()) {
             return false;
         }
-        this.appRepository.delete(app);
+
+        this.appRepository.delete(app.get());
 
         return true;
     }
@@ -76,20 +83,41 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public void learning() {
-        App app1 = new App("name1", "domain1.com");
-        App app2 = new App("name2", "domain2.com");
 
-        List<App> appList = new ArrayList<>();
-        appList.add(app1);
-        appList.add(app2);
+        appRepository.saveAll(apps);
 
-        appRepository.save(app1);
-        appRepository.save(app2);
+        for (App app :apps) {
+            Random rand = new Random();
+            int n = rand.nextInt(10);
+            List<Integer> userIds = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                Random rand2 = new Random();
+                int el = rand2.nextInt(200) + 1;
+                if (userIds.contains(el)) {
+                    i--;
+                } else {
+                    userIds.add(el);
+                }
+            }
+            List<User> userList = new ArrayList<>();
+            for (Integer id : userIds) {
+                for (User user : users) {
+                    if (user.getUserPassword().length() + 3 >= 30) {
+                        user.setUserPassword("Qwer1234!");
+                    }
+                    user.setUserPassword(user.getUserPassword() + "1Q!");
+                    if (user.getId().equals(Long.parseLong(String.valueOf(id)))) {
+                        userList.add(user);
+                        List<App> appList = user.getAppList();
+                        appList.add(app);
+                        user.setAppList(appList);
+                    }
+                }
+            }
+            app.setUserList(userList);
+        }
 
-        User user = new User("firstName", "secondName", "email@gmail.com", "Poland", "MelkorW", "0uC32wVsKA!", Role.USER);
-        user.setAppList(appList);
-
-        User userSaved = userRepository.save(user);
+        userRepository.saveAll(users);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.wardyn.Projekt2.validators;
 
-
 import com.wardyn.Projekt2.validatorInterfaces.ValidDomain;
 
 import javax.validation.ConstraintValidator;

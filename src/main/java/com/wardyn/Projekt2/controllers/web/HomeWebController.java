@@ -1,9 +1,9 @@
 package com.wardyn.Projekt2.controllers.web;
 
+import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.User;
 import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
-import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 
 

@@ -4,17 +4,12 @@ import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.User;
 import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.repositories.UserRepository;
-import com.wardyn.Projekt2.services.interfaces.AppService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -51,7 +46,6 @@ public class UserServiceImpl implements UserService {
         }
         optionalUser.ifPresent(userToEdit -> {
             user.setId(userToEdit.getId());
-
             this.userRepository.save(user);
         });
 

@@ -9,7 +9,5 @@ import java.util.List;
 
 @Repository
 public interface AppRepository extends CrudRepository<App, Long> {
-
-    App findAppById(Long id);
     List<App> findAllByUserListIsContaining(User user);
 }

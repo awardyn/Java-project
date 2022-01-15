@@ -5,7 +5,6 @@ import com.wardyn.Projekt2.domains.Search;
 import com.wardyn.Projekt2.domains.User;
 import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
-import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -27,12 +26,10 @@ import java.util.stream.Collectors;
 public class UserWebController {
     private final UserService userService;
     private final AppService appService;
-    private final AuthorizationService authorizationService;
 
-    public UserWebController(UserService userService, AppService appService, AuthorizationService authorizationService) {
+    public UserWebController(UserService userService, AppService appService) {
         this.userService = userService;
         this.appService = appService;
-        this.authorizationService = authorizationService;
     }
 
     @GetMapping("/users")
@@ -72,7 +69,7 @@ public class UserWebController {
             boolean isAdmin = user.getRole().equals(Role.ADMIN);
             if (isAdmin) {
                 List<List<Object>> list = createListOfApps();
-                App appSearch = appService.getAppById(search.getSearchBy());
+                App appSearch = appService.getAppById(search.getSearchBy()).get();
 
                 model.addAttribute("apps", list);
                 model.addAttribute("search", new Search(search.getSearchBy()));
