@@ -2,6 +2,7 @@ package com.wardyn.Projekt2.services.implementations;
 
 import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.repositories.UserRepository;
 import com.wardyn.Projekt2.services.interfaces.AppService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
@@ -37,6 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addUser(User user) {
+        user.setRole(Role.USER);
         this.userRepository.save(user);
     }
 
