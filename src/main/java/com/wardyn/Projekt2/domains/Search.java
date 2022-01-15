@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Search {
-    private Integer searchBy;
+    private Long searchBy;
 
-    public Search(Integer searchBy) {
+    public Search(Long searchBy) {
         this.searchBy = searchBy;
     }
 

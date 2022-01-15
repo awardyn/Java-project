@@ -12,4 +12,8 @@ public class Login {
     private String password;
 
     public Login() {}
+    public Login(Login login) {
+        this.password = login.getPassword();
+        this.username = login.getUsername();
+    }
 }

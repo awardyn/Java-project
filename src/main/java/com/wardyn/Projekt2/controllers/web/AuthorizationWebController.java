@@ -5,7 +5,6 @@ import com.wardyn.Projekt2.domains.User;
 import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -64,7 +63,7 @@ public class AuthorizationWebController {
             model.addAttribute("action", "create");
             return "user/userForm";
         }
-        
+
         authorizationService.register(user);
 
         return "redirect:/";

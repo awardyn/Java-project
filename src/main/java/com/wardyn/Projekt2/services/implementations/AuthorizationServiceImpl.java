@@ -3,20 +3,19 @@ package com.wardyn.Projekt2.services.implementations;
 import com.wardyn.Projekt2.domains.Login;
 import com.wardyn.Projekt2.domains.User;
 import com.wardyn.Projekt2.enums.Role;
+import com.wardyn.Projekt2.repositories.UserRepository;
 import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
-import com.wardyn.Projekt2.services.interfaces.UserService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthorizationServiceImpl implements AuthorizationService {
 
-    private Role role = Role.GUEST; //TODO manage roles
+    private Role role = Role.GUEST;
     private User loggedUser;
-    private final UserService userService;
+    final UserRepository userRepository;
 
-    public AuthorizationServiceImpl(@Lazy UserService userService) {
-        this.userService = userService;
+    public AuthorizationServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -31,17 +30,18 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public boolean login(Login login) {
-        User user = userService.getUserById(1);
+        System.out.println(userRepository.findAll());
+        User user = userRepository.findUserByUsernameAndUserPassword(login.getUsername(), login.getPassword());
         if (user == null) {
             return false;
         }
-
+        this.role = Role.USER;
         this.loggedUser = user;
         return true;
     }
 
     @Override
     public void register(User user) {
-        userService.addUser(user);
+        userRepository.save(user);
     }
 }
