@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,62 +36,78 @@ public class UserWebController {
     }
 
     @GetMapping("/users")
-    public String getUsers(Model model) {
+    public String getUsers(Model model, @CookieValue(value = "id", defaultValue = "-1") String id) {
+        Long parsedId = Long.parseLong(id);
 
-        List<List<Object>> list = createListOfApps();
+        Optional<User> loggedUser = userService.getUserById(parsedId);
 
-        model.addAttribute("apps", list);
-        model.addAttribute("search", new Search());
-        model.addAttribute("users", userService.getUsers());
+        if (loggedUser.isPresent()) {
+            User user = loggedUser.get();
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+            if (isAdmin) {
+                List<List<Object>> list = createListOfApps();
 
-        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
-
-        if (isAdmin) {
-            return "user/users";
-        } else {
-            return "redirect:/";
+                model.addAttribute("apps", list);
+                model.addAttribute("search", new Search());
+                model.addAttribute("users", userService.getUsers());
+                return "user/users";
+            }
         }
+
+        return "redirect:/";
     }
 
     @GetMapping("/users/search")
-    public String getUsersByAppName(Search search, Model model) {
+    public String getUsersByAppName(Search search, Model model, @CookieValue(value = "id", defaultValue = "-1") String id) {
         if(search.getSearchBy().equals(-1L)) {
             return "redirect:/users";
         }
 
-        List<List<Object>> list = createListOfApps();
+        Long parsedId = Long.parseLong(id);
 
-        App appSearch = appService.getAppById(search.getSearchBy());
+        Optional<User> loggedUser = userService.getUserById(parsedId);
 
-        model.addAttribute("apps", list);
-        model.addAttribute("search", new Search(search.getSearchBy()));
-        model.addAttribute("users", userService.getUsersByAppId(appSearch));
+        if (loggedUser.isPresent()) {
+            User user = loggedUser.get();
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+            if (isAdmin) {
+                List<List<Object>> list = createListOfApps();
+                App appSearch = appService.getAppById(search.getSearchBy());
 
-        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
-
-        if (isAdmin) {
-            return "user/users";
-        } else {
-            return "redirect:/";
+                model.addAttribute("apps", list);
+                model.addAttribute("search", new Search(search.getSearchBy()));
+                model.addAttribute("users", userService.getUsersByAppId(appSearch));
+                return "user/users";
+            }
         }
+
+        return "redirect:/";
     }
 
     @GetMapping("/users/{id}")
-    public String getUserById(@PathVariable Long id, Model model) {
-        boolean isAdmin = authorizationService.role().equals(Role.ADMIN);
+    public String getUserById(@PathVariable Long id, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
+        Long parsedId = Long.parseLong(cookieId);
 
-        User user = userService.getUserById(id);
-        if (user == null) {
-            model.addAttribute("error", "There is no user with given id");
-            return "user/user";
+        Optional<User> loggedUser = userService.getUserById(parsedId);
+
+        if (loggedUser.isPresent()) {
+            User user = loggedUser.get();
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+            if (isAdmin) {
+
+                Optional<User> userToDisplay = userService.getUserById(id);
+                if (!userToDisplay.isPresent()) {
+                    model.addAttribute("error", "There is no user with given id");
+                    return "user/user";
+                }
+
+                model.addAttribute("user", userToDisplay.get());
+                model.addAttribute("apps", userToDisplay.get().getAppList());
+
+                return "user/user";
+            }
         }
 
-        if (isAdmin) {
-            model.addAttribute("user", user);
-            model.addAttribute("apps", user.getAppList());
-
-            return "user/user";
-        }
         return "redirect:/";
     }
 
@@ -103,17 +120,28 @@ public class UserWebController {
     }
 
     @GetMapping("/users/{id}/edit")
-    public String userEdit(@PathVariable Long id, Model model) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            model.addAttribute("error", "There is no user with given id");
-            return "user/userForm";
+    public String userEdit(@PathVariable Long id, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
+        Long parsedId = Long.parseLong(cookieId);
+
+        Optional<User> loggedUser = userService.getUserById(parsedId);
+
+        if (loggedUser.isPresent()) {
+            User user = loggedUser.get();
+            boolean isAdmin = user.getRole().equals(Role.ADMIN);
+            if (isAdmin) {
+                Optional<User> userToEdit = userService.getUserById(id);
+                if (!userToEdit.isPresent()) {
+                    model.addAttribute("error", "There is no user with given id");
+                    return "user/userForm";
+                }
+
+                model.addAttribute("user", userToEdit.get());
+                model.addAttribute("action", "edit");
+
+                return "user/userForm";
+            }
         }
-
-        model.addAttribute("user", user);
-        model.addAttribute("action", "edit");
-
-        return "user/userForm";
+        return "redirect:/";
     }
 
     @PostMapping("/users/create")

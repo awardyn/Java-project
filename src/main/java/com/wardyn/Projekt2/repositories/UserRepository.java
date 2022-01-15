@@ -6,10 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-    User findUserById(Long id);
     List<User> findAllByAppListIsContaining(App app);
-    User findUserByUsernameAndUserPassword(String username, String userPassword);
+    Optional<User> findUserByUsernameAndUserPassword(String username, String userPassword);
 }

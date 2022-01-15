@@ -12,4 +12,5 @@ public interface AppService {
     Boolean editApp(App app);
     Boolean deleteApp(Long appId);
     List<App> getAppsByUserId(User user);
+    void learning();
 }

@@ -1,14 +1,11 @@
 package com.wardyn.Projekt2.domains;
 
+import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.validatorInterfaces.ValidPassword;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,17 +43,23 @@ public class User {
     @NotNull(message = "Password cannot be null")
     private String userPassword;
 
-    @ManyToMany
-    private List<App> appList;
+    @ManyToMany(fetch = javax.persistence.FetchType.EAGER)
+    @JoinTable(name = "User_appList",
+            joinColumns = @JoinColumn(name = "userList_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "appList_id", referencedColumnName = "id"))
+    private List<App> appList = new ArrayList<>();
+
+    private Role role;
 
     public User() {}
 
-    public User(String firstName, String lastName, String email, String country, String username, String userPassword) {
+    public User(String firstName, String lastName, String email, String country, String username, String userPassword, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.country = country;
         this.username = username;
         this.userPassword = userPassword;
+        this.role = role;
     }
 }

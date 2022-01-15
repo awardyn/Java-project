@@ -33,8 +33,8 @@ public class App {
     @ValidDomain
     private String domain;
 
-    @ManyToMany(mappedBy = "appList")
-    private List<User> userList;
+    @ManyToMany(fetch = javax.persistence.FetchType.EAGER, mappedBy = "appList")
+    private List<User> userList = new ArrayList<>();
 
     public App() {}
 

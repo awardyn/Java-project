@@ -11,16 +11,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final AppService appService;
     final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository, @Lazy AppService appService) {
-        this.appService = appService;
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -32,8 +31,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) {
-        return this.userRepository.findUserById(id);
+    public Optional<User> getUserById(Long id) {
+        return this.userRepository.findById(id);
     }
 
     @Override
@@ -43,28 +42,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean editUser(User user) {
-        User userToEdit = getUserById(user.getId());
+        Optional<User> optionalUser = getUserById(user.getId());
 
-        if (userToEdit == null) {
+        if (!optionalUser.isPresent()) {
             return false;
         }
+        optionalUser.ifPresent(userToEdit -> {
+            user.setId(userToEdit.getId());
 
-        user.setId(userToEdit.getId());
-
-        this.userRepository.save(user);
+            this.userRepository.save(user);
+        });
 
         return true;
     }
 
     @Override
     public Boolean deleteUser(Long userId) {
-        User user = getUserById(userId);
+        Optional<User> user = getUserById(userId);
 
-        if (user == null) {
+        if (!user.isPresent()) {
             return false;
         }
 
-        this.userRepository.delete(user);
+        user.ifPresent(this.userRepository::delete);
 
         return true;
     }
