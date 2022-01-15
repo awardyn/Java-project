@@ -20,7 +20,6 @@ public class AuthorizationWebController {
 
     private final AuthorizationService authorizationService;
 
-    @Autowired
     public AuthorizationWebController(AuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
     }
@@ -48,11 +47,11 @@ public class AuthorizationWebController {
 
     @PostMapping("/login")
     public String login(Login login, Model model, BindingResult errors) {
-        System.out.println(login.getUsername());
         boolean loggedIn = authorizationService.login(login);
 
         if (!loggedIn) {
             model.addAttribute("error", "Username or password are incorrect, try again");
+            model.addAttribute("login", new Login(login));
             return "user/loginForm";
         }
 
@@ -63,9 +62,10 @@ public class AuthorizationWebController {
     public String register(@Valid User user, Model model, BindingResult errors) {
         if (errors.hasErrors()) {
             model.addAttribute("action", "create");
-
             return "user/userForm";
         }
+        
+        authorizationService.register(user);
 
         return "redirect:/";
     }

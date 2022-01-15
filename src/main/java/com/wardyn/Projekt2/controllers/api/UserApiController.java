@@ -20,7 +20,7 @@ public class UserApiController {
     }
 
     @GetMapping("/api/users/{id}")
-    User userById(@PathVariable Integer id) throws Exception {
+    User userById(@PathVariable Long id) throws Exception {
         User user = this.userService.getUserById(id);
 
         if (user == null) {

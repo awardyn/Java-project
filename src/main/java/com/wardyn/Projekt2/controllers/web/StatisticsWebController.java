@@ -3,7 +3,6 @@ package com.wardyn.Projekt2.controllers.web;
 import com.wardyn.Projekt2.services.interfaces.AppService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +17,6 @@ public class StatisticsWebController {
     private final UserService userService;
     private final AppService appService;
 
-    @Autowired
     public StatisticsWebController(UserService userService, AppService appService) {
         this.userService = userService;
         this.appService = appService;
@@ -110,7 +108,6 @@ public class StatisticsWebController {
         values.add("More than 3 apps");
         values.add("Less than 3 apps");
         long firstValue = userService.getUsers().stream().filter(u -> u.getAppList().size() > 3).count() * 100 / userService.getUsers().size();
-        System.out.println(firstValue);
         values.add(firstValue);
         values.add(100 - firstValue);
         return values;

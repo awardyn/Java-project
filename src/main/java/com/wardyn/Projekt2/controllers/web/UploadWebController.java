@@ -6,7 +6,6 @@ import com.wardyn.Projekt2.services.interfaces.AppService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -21,7 +20,6 @@ public class UploadWebController {
     private final AppService appService;
     private final UserService userService;
 
-    @Autowired
     public UploadWebController(AppService appService, UserService userService) {
         this.appService = appService;
         this.userService = userService;
