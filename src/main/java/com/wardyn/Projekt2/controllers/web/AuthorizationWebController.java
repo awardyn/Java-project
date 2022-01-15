@@ -77,6 +77,16 @@ public class AuthorizationWebController {
         return "redirect:/";
     }
 
+    @GetMapping("/logout")
+    public String logout(Login login, Model model, HttpServletResponse response) {
+        Optional<User> user = authorizationService.login(login);
+
+        Cookie cookie = new Cookie("id", "-1");
+        response.addCookie(cookie);
+
+        return "redirect:/";
+    }
+
     @PostMapping("/register")
     public String register(@Valid User user, Model model, BindingResult errors) {
         if (errors.hasErrors()) {

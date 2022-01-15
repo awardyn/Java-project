@@ -36,6 +36,7 @@ public class HomeWebController {
             model.addAttribute("isGuest", true);
         } else {
             User user = loggedUser.get();
+
             boolean isAdmin = user.getRole().equals(Role.ADMIN);
             boolean isUser = user.getRole().equals(Role.USER);
 

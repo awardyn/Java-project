@@ -26,6 +26,7 @@
             <form th:method="delete" th:action="@{'/users/delete/' + ${user.getId()}}">
                 <button type="submit" class="btn btn-outline-danger"> Delete user</button>
             </form>
+            <a class="btn btn-primary" th:href="@{/logout}" role="button" style="max-width: 150px">Logout</a>
         </div>
 
         <div th:if="${user}" style="margin: 1rem; display: flex; justify-content: center; align-items: center; flex-direction: column">

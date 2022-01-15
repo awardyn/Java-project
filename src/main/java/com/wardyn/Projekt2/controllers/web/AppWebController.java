@@ -138,13 +138,13 @@ public class AppWebController {
         Optional<User> loggedUser = userService.getUserById(parsedId);
 
         if (!loggedUser.isPresent()) {
-            return "redirect:/apps";
+            return "redirect:/apps/" + id;
         }
 
         User user = loggedUser.get();
 
         if (!user.getRole().equals(Role.ADMIN)) {
-            return "redirect:/apps";
+            return "redirect:/apps/" + id;
         }
 
         Optional<App> app = appService.getAppById(id);

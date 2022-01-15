@@ -91,7 +91,6 @@ public class UserWebController {
             User user = loggedUser.get();
             boolean isAdmin = user.getRole().equals(Role.ADMIN);
             if (isAdmin) {
-
                 Optional<User> userToDisplay = userService.getUserById(id);
                 if (!userToDisplay.isPresent()) {
                     model.addAttribute("error", "There is no user with given id");
@@ -125,13 +124,12 @@ public class UserWebController {
         if (loggedUser.isPresent()) {
             User user = loggedUser.get();
             boolean isAdmin = user.getRole().equals(Role.ADMIN);
-            if (isAdmin) {
+            if (isAdmin || id.equals(parsedId)) {
                 Optional<User> userToEdit = userService.getUserById(id);
                 if (!userToEdit.isPresent()) {
                     model.addAttribute("error", "There is no user with given id");
                     return "user/userForm";
                 }
-
                 model.addAttribute("user", userToEdit.get());
                 model.addAttribute("action", "edit");
 
@@ -163,7 +161,7 @@ public class UserWebController {
     }
 
     @PostMapping("/users/{id}/edit")
-    public String editUser(@Valid User user, BindingResult errors, RedirectAttributes redirectAttributes, Model model) {
+    public String editUser(@PathVariable Long id, @Valid User user, BindingResult errors, RedirectAttributes redirectAttributes, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
         if (errors.hasErrors()) {
             model.addAttribute("action", "edit");
             return "user/userForm";
@@ -183,6 +181,10 @@ public class UserWebController {
         if (edited.equals(false)) {
             redirectAttributes.addFlashAttribute("error", "There is no user with given id");
             return "redirect:/users/" + user.getId() + "/edit";
+        }
+
+        if (id.equals(Long.parseLong(cookieId))) {
+            return "redirect:/";
         }
 
         return "redirect:/users/" + user.getId();

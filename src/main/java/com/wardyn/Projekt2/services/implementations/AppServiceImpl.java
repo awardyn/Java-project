@@ -86,6 +86,15 @@ public class AppServiceImpl implements AppService {
 
         appRepository.saveAll(apps);
 
+        for (User user : users) {
+            user.setRole(Role.USER);
+            if (user.getUserPassword().length() + 3 >= 30) {
+                user.setUserPassword("Qwer1234!");
+            } else {
+                user.setUserPassword(user.getUserPassword() + "1Q!");
+            }
+        }
+
         for (App app :apps) {
             Random rand = new Random();
             int n = rand.nextInt(10);
@@ -99,23 +108,20 @@ public class AppServiceImpl implements AppService {
                     userIds.add(el);
                 }
             }
-            List<User> userList = new ArrayList<>();
             for (Integer id : userIds) {
                 for (User user : users) {
-                    if (user.getUserPassword().length() + 3 >= 30) {
-                        user.setUserPassword("Qwer1234!");
-                    }
-                    user.setUserPassword(user.getUserPassword() + "1Q!");
                     if (user.getId().equals(Long.parseLong(String.valueOf(id)))) {
-                        userList.add(user);
                         List<App> appList = user.getAppList();
                         appList.add(app);
                         user.setAppList(appList);
                     }
                 }
             }
-            app.setUserList(userList);
         }
+
+        User admin = new User("admin", "admin", "admin@project.com", "Polska", "admin", "0uC32wVsKA1Q!", Role.ADMIN);
+
+        users.add(admin);
 
         userRepository.saveAll(users);
     }
