@@ -14,7 +14,7 @@
     <h2 th:text="${error}"></h2>
 </div>
 
-<form th:if="${error == null}" method="POST" th:action="@{/login}" th:object="${login}">
+<form  method="POST" th:action="@{/login}" th:object="${login}">
     <div th:if="${#fields.hasErrors()}" style="margin-bottom: 1rem">
           <span style="color: red">
              Please correct the problems below and resubmit.
