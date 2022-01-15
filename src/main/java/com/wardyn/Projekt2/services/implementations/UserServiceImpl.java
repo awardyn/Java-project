@@ -1,6 +1,8 @@
 package com.wardyn.Projekt2.services.implementations;
 
+import com.wardyn.Projekt2.domains.App;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.repositories.UserRepository;
 import com.wardyn.Projekt2.services.interfaces.AppService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,58 +16,29 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final List<User> userList;
     private final AppService appService;
+    final UserRepository userRepository;
 
-    public UserServiceImpl(@Autowired List<User> userList, @Lazy AppService appService) {
-        this.userList = userList;
+    public UserServiceImpl(UserRepository userRepository, @Lazy AppService appService) {
         this.appService = appService;
+        this.userRepository = userRepository;
     }
 
     @Override
     public List<User> getUsers() {
-        return this.userList;
+        List<User> userList = new ArrayList<>();
+        this.userRepository.findAll().forEach(userList::add);
+        return userList;
     }
 
     @Override
-    public User getUserById(Integer id) {
-        if (this.userList != null) {
-            for (User user : this.userList) {
-                if (user.getId().equals(id)) {
-                    return user;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<User> getAppUsers(List<Integer> userIds) {
-        Predicate<User> byAppId = user -> userIds.contains(user.getId());
-        return this.userList.stream().filter(byAppId).collect(Collectors.toList());
-    }
-
-    @Override
-    public void updateAppInUsers(List<Integer> userIds, Integer appId) {
-        for (User user : this.userList) {
-            if (user.getAppList().contains(appId) && !userIds.contains(user.getId())) {
-                List<Integer> apps = user.getAppList();
-                apps.remove(appId);
-                user.setAppList(apps);
-            } else if (!user.getAppList().contains(appId) && userIds.contains(user.getId())) {
-                List<Integer> apps = user.getAppList();
-                apps.add(appId);
-                user.setAppList(apps);
-            }
-        }
+    public User getUserById(Long id) {
+        return this.userRepository.findUserById(id);
     }
 
     @Override
     public void addUser(User user) {
-        user.setId(this.userList.get(this.userList.size() - 1).id + 1);
-
-        this.userList.add(user);
-        this.appService.updateUserInApps(user.getAppList(), user.getId());
+        this.userRepository.save(user);
     }
 
     @Override
@@ -76,30 +49,28 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-        int index = this.userList.indexOf(userToEdit);
+        user.setId(userToEdit.getId());
 
-        this.userList.set(index, user);
-        this.appService.updateUserInApps(user.getAppList(), user.getId());
+        this.userRepository.save(user);
 
         return true;
     }
 
     @Override
-    public Boolean deleteUser(Integer userId) {
+    public Boolean deleteUser(Long userId) {
         User user = getUserById(userId);
 
         if (user == null) {
             return false;
         }
 
-        this.userList.remove(user);
-        appService.updateUserInApps(new ArrayList<>(), userId);
+        this.userRepository.delete(user);
+
         return true;
     }
 
     @Override
-    public List<User> getUsersByAppId(Integer appId) {
-        Predicate<User> byAppId = user -> user.getAppList().contains(appId);
-        return this.userList.stream().filter(byAppId).collect(Collectors.toList());
+    public List<User> getUsersByAppId(App app) {
+        return this.userRepository.findAllByAppListIsContaining(app);
     }
 }
