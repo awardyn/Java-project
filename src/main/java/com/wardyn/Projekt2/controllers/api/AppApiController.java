@@ -19,7 +19,7 @@ public class AppApiController {
     }
 
     @GetMapping("/api/apps/{id}")
-    HashMap<String, HashMap<String, Object>> appById(@PathVariable Integer id) throws Exception {
+    HashMap<String, HashMap<String, Object>> appById(@PathVariable Long id) throws Exception {
         App app = this.appService.getAppById(id);
 
         if (app == null) {

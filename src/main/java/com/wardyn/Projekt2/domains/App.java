@@ -4,6 +4,10 @@ import com.wardyn.Projekt2.validatorInterfaces.ValidDomain;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +15,14 @@ import java.util.Random;
 
 import static java.lang.Integer.parseInt;
 
+@Entity
 @Setter
 @Getter
 public class App {
-    public Integer id;
+
+    @Id
+    @GeneratedValue
+    public Long id;
 
     @NotNull(message = "App name cannot be null")
     @Size(min = 2, max = 50, message = "App name must be between 2 and 50 characters")
@@ -25,13 +33,12 @@ public class App {
     @ValidDomain
     private String domain;
 
-    private List<Integer> userList = new ArrayList<>();
+    @ManyToMany(mappedBy = "appList")
+    private List<User> userList;
 
     public App() {}
 
-    public App(String id, String name, String domain) {
-        this.userList = new ArrayList<>();
-        this.id = parseInt(id);
+    public App(String name, String domain) {
         this.name = name;
         this.domain = domain;
     }

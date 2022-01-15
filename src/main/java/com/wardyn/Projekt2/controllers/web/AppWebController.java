@@ -12,11 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -54,15 +51,17 @@ public class AppWebController {
 
     @GetMapping("/apps/search")
     public String getAppsByUsername(Search search, Model model) {
-        if(search.getSearchBy().equals(-1)) {
+        if(search.getSearchBy().equals(-1L)) {
             return "redirect:/apps";
         }
 
         List<List<Object>> list = createListOfUsers();
 
+        User userSearchBy = userService.getUserById(search.getSearchBy());
+
         model.addAttribute("users", list);
         model.addAttribute("search", new Search(search.getSearchBy()));
-        model.addAttribute("apps", appService.getAppsByUserId(search.getSearchBy()));
+        model.addAttribute("apps", appService.getAppsByUserId(userSearchBy));
         model.addAttribute("isAdmin", authorizationService.role().equals(Role.ADMIN));
         model.addAttribute("logged", authorizationService.role().equals(Role.ADMIN) || authorizationService.role().equals(Role.USER));
 
@@ -70,7 +69,7 @@ public class AppWebController {
     }
 
     @GetMapping("/apps/{id}")
-    public String getAppById(@PathVariable Integer id, Model model) {
+    public String getAppById(@PathVariable Long id, Model model) {
         App app = appService.getAppById(id);
         if (app == null) {
             model.addAttribute("error", "There is no app with given id");
@@ -79,7 +78,7 @@ public class AppWebController {
 
         model.addAttribute("isAdmin", authorizationService.role().equals(Role.ADMIN));
         model.addAttribute("app", app);
-        model.addAttribute("users", userService.getAppUsers(app.getUserList()));
+        model.addAttribute("users", app.getUserList());
 
         return "app/app";
     }
@@ -99,7 +98,7 @@ public class AppWebController {
     }
 
     @GetMapping("/apps/{id}/edit")
-    public String appEdit(@PathVariable Integer id, Model model) {
+    public String appEdit(@PathVariable Long id, Model model) {
         boolean isAdmin =  authorizationService.role().equals(Role.ADMIN);
 
         if (!isAdmin) {
@@ -166,7 +165,7 @@ public class AppWebController {
     }
 
     @DeleteMapping("/apps/delete/{id}")
-    public String deleteApp(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    public String deleteApp(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Boolean deleted = appService.deleteApp(id);
         if (deleted.equals(false)) {
             redirectAttributes.addFlashAttribute("error", "There is no app with given id to delete");
@@ -178,7 +177,7 @@ public class AppWebController {
     private List<List<Object>> createListOfUsers() {
         List<List<Object>> list = new ArrayList<>();
         List<Object> all = new ArrayList<>();
-        all.add(-1);
+        all.add(-1L);
         all.add("all");
 
         list.add(all);
