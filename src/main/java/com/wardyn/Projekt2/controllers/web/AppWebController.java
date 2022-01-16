@@ -7,7 +7,6 @@ import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AppService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -28,7 +27,6 @@ public class AppWebController {
     private final AppService appService;
     private final UserService userService;
 
-    @Autowired
     public AppWebController(AppService appService, UserService userService) {
         this.appService = appService;
         this.userService = userService;

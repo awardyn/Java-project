@@ -28,7 +28,9 @@ public class User {
     @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
 
+    @NotNull(message = "Email cannot be null")
     @Email(message = "Email should be valid")
+    @Column(unique = true)
     private String email;
 
     @NotNull(message = "Country cannot be null")
@@ -37,6 +39,7 @@ public class User {
 
     @NotNull(message = "Last name cannot be null")
     @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
+    @Column(unique = true)
     private String username;
 
     @ValidPassword
@@ -62,4 +65,14 @@ public class User {
         this.userPassword = userPassword;
         this.role = role;
     }
+
+    @Override
+    public String toString() {
+        return "id = " + id +
+                ",\n First name = " + firstName +
+                ",\n Last name = " + lastName +
+                ",\n Country = " + country +
+                ",\n Username = " + username;
+    }
+
 }

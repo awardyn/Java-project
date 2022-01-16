@@ -60,8 +60,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     InternetAddress.parse(user.getEmail())
             );
             message.setSubject("Thank you for registration");
-            message.setText("Dear Mail Crawler,"
-                    + "\n\n Please do not spam my email!");
+            message.setText("We are happy you choose our application"
+                    + "\n\n Below you can find some information about your account"
+                    + "\n\n " + user.toString());
 
             Transport.send(message);
         } catch (MessagingException e) {

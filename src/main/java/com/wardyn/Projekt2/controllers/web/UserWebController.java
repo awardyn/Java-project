@@ -157,6 +157,7 @@ public class UserWebController {
             return "user/userForm";
         }
 
+        user.setRole(Role.USER);
         userService.addUser(user);
 
         return "redirect:/users";
