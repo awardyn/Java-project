@@ -45,10 +45,12 @@ public class AppWebController {
         if (!loggedUser.isPresent()) {
             model.addAttribute("isAdmin", false);
             model.addAttribute("logged", false);
+            model.addAttribute("loggedUser", null);
         } else {
             User user = loggedUser.get();
             model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
             model.addAttribute("logged", true);
+            model.addAttribute("loggedUser", user);
         }
 
         model.addAttribute("users", list);
@@ -76,10 +78,12 @@ public class AppWebController {
         if (!loggedUser.isPresent()) {
             model.addAttribute("isAdmin", false);
             model.addAttribute("logged", false);
+            model.addAttribute("loggedUser", null);
         } else {
             User user = loggedUser.get();
             model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
             model.addAttribute("logged", true);
+            model.addAttribute("loggedUser", user);
         }
 
         model.addAttribute("users", list);
@@ -113,6 +117,94 @@ public class AppWebController {
         model.addAttribute("users", app.get().getUserList());
 
         return "app/app";
+    }
+
+    @GetMapping("/apps/{id}/assign")
+    public String assignApp(@PathVariable Long id, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
+        Optional<App> app = appService.getAppById(id);
+        if (!app.isPresent()) {
+            model.addAttribute("error", "There is no app with given id");
+            return "app/apps";
+        }
+
+        Long parsedId = Long.parseLong(cookieId);
+
+        Optional<User> loggedUser = userService.getUserById(parsedId);
+
+        if (loggedUser.isPresent()) {
+            User user = loggedUser.get();
+            if (user.getRole().equals(Role.ADMIN)) {
+                List<List<Object>> list = createListOfUsers();
+                model.addAttribute("error", "Admin cannot assign apps to himself");
+                model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
+                model.addAttribute("logged", true);
+                model.addAttribute("loggedUser", user);
+                model.addAttribute("users", list);
+                model.addAttribute("search", new Search());
+                model.addAttribute("apps", appService.getApps());
+                return "app/apps";
+            }
+            List<App> userAppList = user.getAppList();
+            if (userAppList.contains(app.get())) {
+                List<List<Object>> list = createListOfUsers();
+                model.addAttribute("error", "App is already assigned to user");
+                model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
+                model.addAttribute("logged", true);
+                model.addAttribute("loggedUser", user);
+                model.addAttribute("users", list);
+                model.addAttribute("search", new Search());
+                model.addAttribute("apps", appService.getApps());
+                return "app/apps";
+            }
+            userAppList.add(app.get());
+            userService.editUser(user);
+        }
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/apps/{id}/unassign")
+    public String unassignApp(@PathVariable Long id, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
+        Optional<App> app = appService.getAppById(id);
+        if (!app.isPresent()) {
+            model.addAttribute("error", "There is no app with given id");
+            return "app/apps";
+        }
+
+        Long parsedId = Long.parseLong(cookieId);
+
+        Optional<User> loggedUser = userService.getUserById(parsedId);
+
+        if (loggedUser.isPresent()) {
+            User user = loggedUser.get();
+            if (user.getRole().equals(Role.ADMIN)) {
+                List<List<Object>> list = createListOfUsers();
+                model.addAttribute("error", "Admin cannot unassign because he doesnt contain them");
+                model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
+                model.addAttribute("logged", true);
+                model.addAttribute("loggedUser", user);
+                model.addAttribute("users", list);
+                model.addAttribute("search", new Search());
+                model.addAttribute("apps", appService.getApps());
+                return "app/apps";
+            }
+            List<App> userAppList = user.getAppList();
+            if (!userAppList.contains(app.get())) {
+                List<List<Object>> list = createListOfUsers();
+                model.addAttribute("error", "App is not in user list of apps");
+                model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
+                model.addAttribute("logged", true);
+                model.addAttribute("loggedUser", user);
+                model.addAttribute("users", list);
+                model.addAttribute("search", new Search());
+                model.addAttribute("apps", appService.getApps());
+                return "app/apps";
+            }
+            userAppList.remove(app.get());
+            userService.editUser(user);
+        }
+
+        return "redirect:/";
     }
 
     @GetMapping("/apps/create")
@@ -160,7 +252,7 @@ public class AppWebController {
     }
 
     @PostMapping("/apps/create")
-    public String createApp(@Valid App app, BindingResult errors, Model model) {
+    public String createApp(@Valid App app, BindingResult errors, Model model, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
         if (errors.hasErrors()) {
             model.addAttribute("action", "create");
             return "app/appForm";
@@ -175,7 +267,23 @@ public class AppWebController {
             return "app/appForm";
         }
 
-        appService.addApp(app);
+        Long parsedId = Long.parseLong(cookieId);
+
+        Optional<User> loggedUser = userService.getUserById(parsedId);
+
+        if (loggedUser.isPresent()) {
+            appService.addApp(app);
+
+            User user = loggedUser.get();
+            if (user.getRole().equals(Role.USER)) {
+                List<App> userAppList = user.getAppList();
+                userAppList.add(app);
+                user.setAppList(userAppList);
+                userService.editUser(user);
+            }
+        }
+
+
 
         return "redirect:/apps";
     }

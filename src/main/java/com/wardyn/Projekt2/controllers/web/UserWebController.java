@@ -213,7 +213,7 @@ public class UserWebController {
                     response.addCookie(cookie);
                     return "redirect:/";
                 }
-                
+
                 return "redirect:/users";
             }
         }

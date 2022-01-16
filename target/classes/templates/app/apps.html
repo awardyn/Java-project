@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<form th:if="${logged}" method="GET" th:action="@{/apps/search}" th:object="${search}">
+<form th:if="${isAdmin}" method="GET" th:action="@{/apps/search}" th:object="${search}">
     <div class="form-group" style="margin-left: 1rem; margin-top: 2rem">
         <label for="username">Search by username of user or get all:</label>
         <select class="form-select" id="username" th:field="*{searchBy}">
@@ -52,6 +52,12 @@
             <td th:text="${app.getUserList().size()}"></td>
             <td>
                 <a th:href="@{'/apps/' + ${app.getId()}}" class="btn btn-primary">Go to</a>
+            </td>
+            <td th:if="${!isAdmin && logged && loggedUser != null && !loggedUser.getAppList().contains(app)}">
+                <a th:href="@{'/apps/' + ${app.getId()} + '/assign'}" class="btn btn-primary">Assign</a>
+            </td>
+            <td th:if="${!isAdmin && logged && loggedUser != null && loggedUser.getAppList().contains(app)}">
+                <a th:href="@{'/apps/' + ${app.getId()} + '/unassign'}" class="btn btn-danger">Unassign</a>
             </td>
             <td>
                 <form th:if="${isAdmin}"  th:method="delete" th:action="@{'/apps/delete/' + ${app.getId()}}">
