@@ -193,32 +193,21 @@ public class UserWebController {
     }
 
     @DeleteMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes, @CookieValue(value = "id", defaultValue = "-1") String cookieId, HttpServletResponse response) {
-        Long parsedId = Long.parseLong(cookieId);
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes, HttpServletResponse response, @CookieValue(value = "id", defaultValue = "-1") String cookieId) {
+        Boolean deleted = userService.deleteUser(id);
 
-        Optional<User> loggedUser = userService.getUserById(parsedId);
-
-        if (loggedUser.isPresent()) {
-            User user = loggedUser.get();
-            if (user.getRole().equals(Role.ADMIN) || parsedId.equals(id)) {
-                Boolean deleted = userService.deleteUser(id);
-
-                if (deleted.equals(false)) {
-                    redirectAttributes.addFlashAttribute("error", "There is no user with given id to delete");
-                    return "redirect:/users";
-                }
-
-                if (id.equals(Long.parseLong(cookieId))) {
-                    Cookie cookie = new Cookie("id", "-1");
-                    response.addCookie(cookie);
-                    return "redirect:/";
-                }
-
-                return "redirect:/users";
-            }
+        if (deleted.equals(false)) {
+            redirectAttributes.addFlashAttribute("error", "There is no user with given id to delete");
+            return "redirect:/users";
         }
 
-        return "redirect:/";
+        if (id.equals(Long.parseLong(cookieId))) {
+            Cookie cookie = new Cookie("id", "-1");
+            response.addCookie(cookie);
+            return "redirect:/";
+        }
+
+        return "redirect:/users";
     }
 
     private List<List<Object>> createListOfApps() {

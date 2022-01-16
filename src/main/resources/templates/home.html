@@ -16,6 +16,7 @@
             <a class="btn btn-primary" th:href="@{/apps}" role="button" style="max-width: 150px">Apps list</a>
             <a class="btn btn-secondary" th:if="${isAdmin}" th:href="@{/users}" role="button" style="max-width: 150px">Users list</a>
             <a class="btn btn-info" th:href="@{/statistics/1}" role="button" style="max-width: 150px">Statistics</a>
+            <a class="btn btn-primary" th:if="${isAdmin}" th:href="@{/logout}" role="button" style="max-width: 150px">Logout</a>
         </div>
         <div style="margin-top: 1rem" th:if="${isGuest}">
             <a class="btn btn-primary" th:href="@{/login}" role="button" style="max-width: 150px">Login</a>
