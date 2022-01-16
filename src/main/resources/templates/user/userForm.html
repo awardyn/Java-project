@@ -17,6 +17,7 @@
 
 <form th:if="${error == null}" method="POST" th:action="@{${action == 'edit' ? '/users/' + user.getId() + '/edit' : '/register'}}" th:object="${user}">
     <input type="number" th:field="*{id}" id="id" hidden/>
+    <input type="text" th:field="*{role}" id="role" hidden/>
     <div th:if="${#fields.hasErrors()}" style="margin-bottom: 1rem">
           <span style="color: red">
              Please correct the problems below and resubmit.

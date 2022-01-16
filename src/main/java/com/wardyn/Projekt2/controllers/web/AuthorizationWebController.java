@@ -2,6 +2,7 @@ package com.wardyn.Projekt2.controllers.web;
 
 import com.wardyn.Projekt2.domains.Login;
 import com.wardyn.Projekt2.domains.User;
+import com.wardyn.Projekt2.enums.Role;
 import com.wardyn.Projekt2.services.interfaces.AuthorizationService;
 import com.wardyn.Projekt2.services.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -33,7 +35,7 @@ public class AuthorizationWebController {
     @GetMapping("/login")
     public String loginView(Model model, @CookieValue(value = "id", defaultValue = "-1") String id) {
         Long parsedId = Long.parseLong(id);
-
+        List<User> userList = userService.getUsers();
         Optional<User> loggedUser = userService.getUserById(parsedId);
 
         if (loggedUser.isPresent()) {
@@ -62,6 +64,7 @@ public class AuthorizationWebController {
 
     @PostMapping("/login")
     public String login(Login login, Model model, HttpServletResponse response) {
+
         Optional<User> user = authorizationService.login(login);
 
         if (!user.isPresent()) {
@@ -94,6 +97,7 @@ public class AuthorizationWebController {
             return "user/userForm";
         }
 
+        user.setRole(Role.USER);
         authorizationService.register(user);
 
         return "redirect:/";
