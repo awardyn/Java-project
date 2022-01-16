@@ -71,6 +71,18 @@ public class AppServiceImpl implements AppService {
             return false;
         }
 
+        List<User> userList = new ArrayList<>();
+        this.userRepository.findAll().forEach(userList::add);
+
+        for (User user: userList) {
+            if (user.getAppList().contains(app.get())) {
+                List<App> userAppList = user.getAppList();
+                userAppList.remove(app.get());
+                user.setAppList(userAppList);
+                userRepository.save(user);
+            }
+        }
+
         this.appRepository.delete(app.get());
 
         return true;
