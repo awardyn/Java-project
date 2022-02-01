@@ -35,7 +35,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     private void sendWelcomeMail(User user) {
         final String username = "projekt.wardyn@gmail.com";
-        final String password = "projektJava1!";
+        final String password = "";
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
